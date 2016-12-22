@@ -85,11 +85,11 @@ make %{?_smp_mflags}
 %install
 make -C %{pecl_name}-%{version} install INSTALL_ROOT=%{buildroot} INSTALL="install -p"
 
-# Install XML package description
-install -Dpm 644 package.xml %{buildroot}%{pecl_xmldir}/%{name}.xml
-
 # install config file
 install -Dpm644 %{ini_name} %{buildroot}%{php_inidir}/%{ini_name}
+
+# Install XML package description
+install -Dpm 644 package.xml %{buildroot}%{pecl_xmldir}/%{pecl_name}.xml
 
 # Documentation
 cd %{pecl_name}-%{version}
@@ -121,14 +121,16 @@ NO_INTERACTION=1 \
 %files
 %license %{pecl_name}-%{version}/LICENSE
 %doc %{pecl_docdir}/%{pecl_name}
+%{pecl_xmldir}/%{pecl_name}.xml
+
 %config(noreplace) %{_sysconfdir}/php.d/%{ini_name}
 %{php_extdir}/%{pecl_name}.so
-%{pecl_xmldir}/%{name}.xml
 
 
 %changelog
 * Thu Dec 22 2016 Carl George <carl.george@rackspace.com> - 1.1.1-1.ius
 - Port from Fedora to IUS
+- Install package.xml as %%{pecl_name}.xml, not %%{name}.xml
 
 * Mon Nov 14 2016 Remi Collet <remi@fedoraproject.org> - 1.1.1-1
 - update to 1.1.1
