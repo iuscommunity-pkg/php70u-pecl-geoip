@@ -22,6 +22,9 @@ BuildRequires:  GeoIP-devel
 Requires:       php(zend-abi) = %{php_zend_api}
 Requires:       php(api) = %{php_core_api}
 
+Requires(post): %{php_base}-pear
+Requires(postun): %{php_base}-pear
+
 # provide the stock name
 Provides:       php-pecl-%{pecl_name} = %{version}
 Provides:       php-pecl-%{pecl_name}%{?_isa} = %{version}
@@ -118,6 +121,16 @@ NO_INTERACTION=1 \
     --show-diff
 
 
+%post
+%{pecl_install} %{pecl_xmldir}/%{pecl_name}.xml >/dev/null || :
+
+
+%postun
+if [ $1 -eq 0 ]; then
+    %{pecl_uninstall} %{pecl_name} >/dev/null || :
+fi
+
+
 %files
 %license %{pecl_name}-%{version}/LICENSE
 %doc %{pecl_docdir}/%{pecl_name}
@@ -131,6 +144,7 @@ NO_INTERACTION=1 \
 * Thu Dec 22 2016 Carl George <carl.george@rackspace.com> - 1.1.1-1.ius
 - Port from Fedora to IUS
 - Install package.xml as %%{pecl_name}.xml, not %%{name}.xml
+- Re-add scriptlets (file triggers not yet available in EL)
 
 * Mon Nov 14 2016 Remi Collet <remi@fedoraproject.org> - 1.1.1-1
 - update to 1.1.1
