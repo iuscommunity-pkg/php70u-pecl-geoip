@@ -1,34 +1,49 @@
-%global php_apiver  %((echo 0; php -i 2>/dev/null | sed -n 's/^PHP API => //p') | tail -1)
-%{!?__pecl:     %{expand: %%global __pecl     %{_bindir}/pecl}}
-%{!?php_extdir: %{expand: %%global php_extdir %(php-config --extension-dir)}}
+# IUS spec file for php70u-pecl-geoip, forked from:
+#
+# Fedora spec file for php-pecl-geoip
 
-%define pecl_name geoip
-%if "%{php_version}" < "5.6"
-%global ini_name  %{pecl_name}.ini
-%else
+%global pecl_name geoip
 %global ini_name  40-%{pecl_name}.ini
-%endif
+%global php_base  php70u
 
-Name:		php-pecl-geoip
-Version:	1.1.1
-Release:	1%{?dist}
-Summary:	Extension to map IP addresses to geographic places
-Group:		Development/Languages
-License:	PHP
-URL:		http://pecl.php.net/package/%{pecl_name}
-Source0:	http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
+Name:           %{php_base}-pecl-%{pecl_name}
+Version:        1.1.1
+Release:        1.ius%{?dist}
+Summary:        Extension to map IP addresses to geographic places
+Group:          Development/Languages
+License:        PHP
+URL:            http://pecl.php.net/package/%{pecl_name}
+Source0:        http://pecl.php.net/get/%{pecl_name}-%{version}.tgz
 
-BuildRequires:	GeoIP-devel
-BuildRequires:	php-devel
-BuildRequires:	php-pear
+BuildRequires:  %{php_base}-devel
+BuildRequires:  %{php_base}-pear
+BuildRequires:  GeoIP-devel
 
 Requires:       php(zend-abi) = %{php_zend_api}
 Requires:       php(api) = %{php_core_api}
 
-Provides:       php-%{pecl_name}               = %{version}
-Provides:       php-%{pecl_name}%{?_isa}       = %{version}
-Provides:       php-pecl(%{pecl_name})         = %{version}
+# provide the stock name
+Provides:       php-pecl-%{pecl_name} = %{version}
+Provides:       php-pecl-%{pecl_name}%{?_isa} = %{version}
+
+# provide the stock and IUS names without pecl
+Provides:       php-%{pecl_name} = %{version}
+Provides:       php-%{pecl_name}%{?_isa} = %{version}
+Provides:       %{php_base}-%{pecl_name} = %{version}
+Provides:       %{php_base}-%{pecl_name}%{?_isa} = %{version}
+
+# provide the stock and IUS names in pecl() format
+Provides:       php-pecl(%{pecl_name}) = %{version}
 Provides:       php-pecl(%{pecl_name})%{?_isa} = %{version}
+Provides:       %{php_base}-pecl(%{pecl_name}) = %{version}
+Provides:       %{php_base}-pecl(%{pecl_name})%{?_isa} = %{version}
+
+# conflict with the stock name
+Conflicts:      php-pecl-%{pecl_name} < %{version}
+
+%{?filter_provides_in: %filter_provides_in %{php_extdir}/.*\.so$}
+%{?filter_provides_in: %filter_provides_in %{php_ztsextdir}/.*\.so$}
+%{?filter_setup}
 
 
 %description
@@ -112,6 +127,9 @@ NO_INTERACTION=1 \
 
 
 %changelog
+* Thu Dec 22 2016 Carl George <carl.george@rackspace.com> - 1.1.1-1.ius
+- Port from Fedora to IUS
+
 * Mon Nov 14 2016 Remi Collet <remi@fedoraproject.org> - 1.1.1-1
 - update to 1.1.1
 
